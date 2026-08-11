@@ -2,6 +2,12 @@ import os
 import requests
 import asyncio
 import edge_tts
+import PIL.Image
+
+# Fix for MoviePy Pillow compatibility issue
+if not hasattr(PIL.Image, 'ANTIALIAS'):
+    PIL.Image.ANTIALIAS = getattr(PIL.Image, 'LANCZOS', getattr(PIL.Image, 'BICUBIC', None))
+
 from groq import Groq
 from moviepy.editor import VideoFileClip, AudioFileClip
 
@@ -21,7 +27,7 @@ async def generate_audio(text):
     communicate = edge_tts.Communicate(text, "en-US-ChristopherNeural")
     await communicate.save("audio.mp3")
 
-# 3. Background Video (Pexels API with Error Check)
+# 3. Background Video (Pexels API)
 def fetch_background():
     headers = {"Authorization": os.environ.get("PEXELS_API_KEY")}
     url = "https://api.pexels.com/videos/search?query=space&per_page=5"
@@ -40,6 +46,7 @@ def create_video():
     audio = AudioFileClip("audio.mp3")
     bg = VideoFileClip("bg.mp4").subclip(0, audio.duration)
     
+    # Resize and crop to 9:16 vertical ratio
     bg_resized = bg.resize(height=1920)
     bg_cropped = bg_resized.crop(x1=bg_resized.w/2 - 540, width=1080, height=1920)
     
