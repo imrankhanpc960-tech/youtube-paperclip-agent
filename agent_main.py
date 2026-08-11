@@ -4,8 +4,7 @@ import requests
 import asyncio
 import edge_tts
 from groq import Groq
-from moviepy.editor import VideoFileClip, AudioFileClip, CompositeVideoClip, TextClip
-
+from moviepy.editor import VideoFileClip, AudioFileClip
 # 1. AI Script Writing
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
