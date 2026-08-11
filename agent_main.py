@@ -9,7 +9,7 @@ from moviepy.editor import VideoFileClip, AudioFileClip
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 def generate_script():
-    prompt = "Write a 30-second fascinating space fact script for YouTube Shorts. Plain text narration only."
+    prompt = "Write a 30-second fascinating space fact script for YouTube Shorts. Plain text narration only, no stage directions or sound effects."
     response = groq_client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
         model="llama-3.1-8b-instant",
@@ -21,17 +21,21 @@ async def generate_audio(text):
     communicate = edge_tts.Communicate(text, "en-US-ChristopherNeural")
     await communicate.save("audio.mp3")
 
-# 3. Background Video (Pexels API)
+# 3. Background Video (Pexels API with Error Check)
 def fetch_background():
     headers = {"Authorization": os.environ.get("PEXELS_API_KEY")}
     url = "https://api.pexels.com/videos/search?query=space&per_page=5"
     response = requests.get(url, headers=headers).json()
+    
+    if "videos" not in response or not response["videos"]:
+        raise ValueError(f"Pexels API Error: Key missing or invalid response: {response}")
+        
     video_url = response['videos'][0]['video_files'][0]['link']
     
     with open("bg.mp4", "wb") as f:
         f.write(requests.get(video_url).content)
 
-# 4. Video Assembly (Shorts 9:16 Format)
+# 4. Video Assembly
 def create_video():
     audio = AudioFileClip("audio.mp3")
     bg = VideoFileClip("bg.mp4").subclip(0, audio.duration)
@@ -42,11 +46,10 @@ def create_video():
     final_clip = bg_cropped.set_audio(audio)
     final_clip.write_videofile("final_short.mp4", fps=30)
 
-
 print("Generating Script...")
 script = generate_script()
 print("Script:", script)
-    
+
 asyncio.run(generate_audio(script))
 fetch_background()
 create_video()
