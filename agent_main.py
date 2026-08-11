@@ -31,7 +31,7 @@ def fetch_background():
     with open("bg.mp4", "wb") as f:
         f.write(requests.get(video_url).content)
 
-# 4. Video Assembly
+# 4. Video Assembly (Shorts 9:16 Format)
 def create_video():
     audio = AudioFileClip("audio.mp3")
     bg = VideoFileClip("bg.mp4").subclip(0, audio.duration)
@@ -42,6 +42,7 @@ def create_video():
     final_clip = bg_cropped.set_audio(audio)
     final_clip.write_videofile("final_short.mp4", fps=30)
 
+# Entry Point (Fixed Double Underscores)
 if name == "main":
     print("Generating Script...")
     script = generate_script()
