@@ -1,42 +1,41 @@
 import os
-import random
 import requests
 import asyncio
 import edge_tts
 from groq import Groq
 from moviepy.editor import VideoFileClip, AudioFileClip
-# 1. AI Script Writing
+
+# 1. Groq AI Script Writing
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 def generate_script():
-    prompt = "Write a 30-second fascinating science fact script for YouTube Shorts. Plain text narration only."
+    prompt = "Write a 30-second fascinating space fact script for YouTube Shorts. Plain text narration only."
     response = groq_client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
         model="llama-3.1-8b-instant",
     )
     return response.choices[0].message.content
 
-# 2. Text to Speech
+# 2. Text to Speech (Edge-TTS)
 async def generate_audio(text):
     communicate = edge_tts.Communicate(text, "en-US-ChristopherNeural")
     await communicate.save("audio.mp3")
 
-# 3. Background Video Download
+# 3. Background Video (Pexels API)
 def fetch_background():
     headers = {"Authorization": os.environ.get("PEXELS_API_KEY")}
-    url = "https://api.pexels.com/videos/search?query=nature&per_page=5"
+    url = "https://api.pexels.com/videos/search?query=space&per_page=5"
     response = requests.get(url, headers=headers).json()
     video_url = response['videos'][0]['video_files'][0]['link']
     
     with open("bg.mp4", "wb") as f:
         f.write(requests.get(video_url).content)
 
-# 4. Video Assembly (Shorts 9:16 Format)
+# 4. Video Assembly
 def create_video():
     audio = AudioFileClip("audio.mp3")
     bg = VideoFileClip("bg.mp4").subclip(0, audio.duration)
     
-    # Crop & Resize to 1080x1920 Vertical format
     bg_resized = bg.resize(height=1920)
     bg_cropped = bg_resized.crop(x1=bg_resized.w/2 - 540, width=1080, height=1920)
     
