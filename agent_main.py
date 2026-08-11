@@ -42,12 +42,12 @@ def create_video():
     final_clip = bg_cropped.set_audio(audio)
     final_clip.write_videofile("final_short.mp4", fps=30)
 
-if name == "main":
-    print("Generating Script...")
-    script = generate_script()
-    print("Script:", script)
+
+print("Generating Script...")
+script = generate_script()
+print("Script:", script)
     
-    asyncio.run(generate_audio(script))
-    fetch_background()
-    create_video()
-    print("Video Render Complete!")
+asyncio.run(generate_audio(script))
+fetch_background()
+create_video()
+print("Video Render Complete!")
