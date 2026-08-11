@@ -1,6 +1,6 @@
 groq
 edge-tts
-moviepy
+moviepy==1.0.3
 requests
 google-api-python-client
 google-auth-oauthlib
