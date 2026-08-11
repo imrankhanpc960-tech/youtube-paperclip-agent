@@ -42,7 +42,6 @@ def create_video():
     final_clip = bg_cropped.set_audio(audio)
     final_clip.write_videofile("final_short.mp4", fps=30)
 
-# Entry Point (Fixed Double Underscores)
 if name == "main":
     print("Generating Script...")
     script = generate_script()
